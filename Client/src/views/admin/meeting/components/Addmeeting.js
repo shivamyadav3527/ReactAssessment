@@ -42,8 +42,35 @@ const AddMeeting = (props) => {
     const formik = useFormik({
         initialValues: initialValues,
         validationSchema: MeetingSchema,
-        onSubmit: (values, { resetForm }) => {
-            
+        onSubmit: async (values, { resetForm }) => {
+        setIsLoding(true);
+        try {
+            const payload = {
+            agenda: values.agenda,
+            attendes: values.related === 'Contact' ? values.attendes : [],
+            attendesLead: values.related === 'Lead' ? values.attendesLead : [],
+            location: values.location,
+            related: values.related,
+            dateTime: values.dateTime,
+            notes: values.notes,
+            createBy: user?._id
+            };
+            await fetch('http://localhost:5001/api/meeting/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            toast.success('Meeting added successfully');
+            resetForm();
+            onClose();
+            setAction('create');
+        } catch (error) {
+            toast.error('Error saving meeting');
+        } finally {
+            setIsLoding(false);
+        }
         },
     });
     const { errors, touched, values, handleBlur, handleChange, handleSubmit, setFieldValue } = formik
@@ -52,13 +79,27 @@ const AddMeeting = (props) => {
 
     };
 
+
     const fetchAllData = async () => {
-        
-    }
+        try {
+            const res = await getApi('meeting/view'); // Adjust this endpoint to your backend
+            // Assuming meetings are returned in res.data
+            // You may want to save this in state or pass to parent component
+            console.log("Meetings fetched:", res.data);
+            // e.g., setMeetings(res.data);
+        } catch (error) {
+            toast.error('Error loading meetings');
+        } finally {
+            setIsLoding(false);
+        }
+    };
+
 
     useEffect(() => {
-
-    }, [props.id, values.related])
+        if (values.related === 'Contact' || values.related === 'Lead') {
+            fetchAllData();
+        }
+    }, [props.id, values.related]);
 
     const extractLabels = (selectedItems) => {
         return selectedItems.map((item) => item._id);
