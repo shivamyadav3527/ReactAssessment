@@ -18,3 +18,6 @@
 - Implement Restful API of "Meeting" in the both of server and client sides (40min)<br/>
   Focus Code Style and Code Optimization. <br/>
   Reference other functions.
+
+![image](https://github.com/user-attachments/assets/bac3d389-72df-4f1a-8dee-141f5a98ace7)
+
